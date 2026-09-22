@@ -5,6 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <!-- Changesets are added here as the schema evolves, one per file, included below. -->
+    <include file="db/changelog/changes/001-create-notes-table.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
