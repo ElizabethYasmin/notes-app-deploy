@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-create-note-categories-table" author="elizabeth">
+        <createTable tableName="note_categories">
+            <column name="note_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="note_categories"
+                        columnNames="note_id, category_id"
+                        constraintName="pk_note_categories"/>
+
+        <addForeignKeyConstraint baseTableName="note_categories"
+                                  baseColumnNames="note_id"
+                                  referencedTableName="notes"
+                                  referencedColumnNames="id"
+                                  constraintName="fk_note_categories_note"
+                                  onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="note_categories"
+                                  baseColumnNames="category_id"
+                                  referencedTableName="categories"
+                                  referencedColumnNames="id"
+                                  constraintName="fk_note_categories_category"
+                                  onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

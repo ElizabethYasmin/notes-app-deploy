@@ -1,6 +1,7 @@
 package com.ensolvers.notes_backend.dto;
 
 import java.time.Instant;
+import java.util.List;
 
 public record NoteResponseDto(
         Long id,
@@ -8,5 +9,6 @@ public record NoteResponseDto(
         String content,
         boolean archived,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        List<CategoryResponseDto> categories
 ) {}

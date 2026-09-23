@@ -52,12 +52,12 @@ public class NoteController {
     }
 
     @GetMapping("/active")
-    public List<NoteResponseDto> listActive() {
-        return noteService.listActive();
+    public List<NoteResponseDto> listActive(@RequestParam(required = false) Long categoryId) {
+        return noteService.listActive(categoryId);
     }
 
     @GetMapping("/archived")
-    public List<NoteResponseDto> listArchived() {
-        return noteService.listArchived();
+    public List<NoteResponseDto> listArchived(@RequestParam(required = false) Long categoryId) {
+        return noteService.listArchived(categoryId);
     }
 }

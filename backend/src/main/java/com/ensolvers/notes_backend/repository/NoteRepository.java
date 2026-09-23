@@ -10,4 +10,8 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByArchivedFalse();
 
     List<Note> findByArchivedTrue();
+
+    List<Note> findByArchivedFalseAndCategories_Id(Long categoryId);
+
+    List<Note> findByArchivedTrueAndCategories_Id(Long categoryId);
 }
