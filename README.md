@@ -1,52 +1,81 @@
-# Notes App — Full Stack Implementation Exercise
+# <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" /> NOTES APP — ENSOLVERS FULLSTACK EXERCISE <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
 
-A notes app where you can create, edit, archive and tag your notes. Built as a Single Page
-Application: an independent React frontend talking to a layered Spring Boot REST API, with
-data persisted in PostgreSQL via JPA/Hibernate (no mocks, no in-memory storage).
+[![LIVE APP](https://img.shields.io/badge/live%20app-%23323330.svg?&style=for-the-badge&logo=netlify&logoColor=white&color=00C7B7)](https://delightful-pastelito-180611.netlify.app)
+[![LIVE API](https://img.shields.io/badge/live%20api-%23323330.svg?&style=for-the-badge&logo=render&logoColor=white&color=000000)](https://notes-backend-1tnf.onrender.com)
+[![REPOSITORIO](https://img.shields.io/badge/repositorio-%23323330.svg?&style=for-the-badge&logo=github&logoColor=white&color=181717)](https://github.com/hirelens-challenges/HuancaParqui-334763)
 
-- **Phase 1** — create, edit, delete, archive/unarchive notes; list active/archived notes.
-- **Phase 2** — tag notes with categories and filter by category.
-- **Extra** — real user accounts (register/login), notes and categories scoped per user,
-  live sync across open sessions of the same user (WebSocket/STOMP), and a fully
-  containerized one-command setup.
+Aplicación fullstack de notas (SPA) desarrollada como ejercicio técnico para Ensolvers. Permite crear, editar, archivar y categorizar notas, con persistencia real en PostgreSQL vía JPA/Hibernate + Liquibase (sin mocks ni almacenamiento en memoria).
 
-## Live demo
+## Menu
+- [Demo en vivo](#demo-en-vivo)
+- [Login](#login)
+- [Stack tecnológico](#stack-tecnológico)
+- [Requisitos y versiones](#requisitos-y-versiones)
+- [Cómo correr el proyecto](#cómo-correr-el-proyecto)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Funcionalidades](#funcionalidades)
+- [Arquitectura](#arquitectura)
+- [Despliegue](#despliegue)
 
-- Frontend: https://delightful-pastelito-180611.netlify.app
-- Backend: https://notes-backend-1tnf.onrender.com
+---
 
-There is no seeded user — register your own account from the live frontend before logging in.
+## Demo en vivo
 
-> The backend runs on Render's free tier, which spins the service down after periods of
-> inactivity. The first request after it's been idle can take up to ~50 seconds while it wakes
-> back up; subsequent requests are fast until it goes idle again.
+Tipo | URL
+------------ | -------------
+<img src="https://img.shields.io/badge/frontend%20-%23323330.svg?&style=for-the-badge&logo=netlify&logoColor=white&color=00C7B7" /> | https://delightful-pastelito-180611.netlify.app
+<img src="https://img.shields.io/badge/backend%20api%20-%23323330.svg?&style=for-the-badge&logo=render&logoColor=white&color=000000" /> | https://notes-backend-1tnf.onrender.com/api
 
-## Requirements
+> El backend corre en el plan gratuito de Render, que "duerme" el servicio tras un rato de inactividad. La primera petición después de eso puede tardar hasta ~50 segundos mientras despierta — no es un error, solo hay que esperar.
 
-| Tool | Version used |
-|---|---|
-| Java (JDK) | 21 (OpenJDK 21.0.10) |
-| Maven | 3.9.16 (via the included `mvnw` wrapper — no local install needed) |
-| Node.js | 25.8.1 |
-| npm | 11.11.0 |
-| PostgreSQL | 16 |
-| Docker | 29.7.2 |
-| Docker Compose | 5.5.0 (works with both the `docker compose` v2 plugin and the standalone `docker-compose` v1 binary) |
+## Login
 
-You don't need Java, Maven or PostgreSQL installed locally if you run the app via Docker (see below).
+La app está protegida con autenticación real (HTTP Basic vía Spring Security), respaldada por una tabla `users` en PostgreSQL — no hay ningún usuario hardcodeado ni sembrado por defecto. En la pantalla de login, usa el link **"Créala"** para registrar tu propia cuenta antes de iniciar sesión.
 
-## Run everything with one command (recommended)
+Cada usuario ve y administra **solo sus propias notas y categorías** — nunca las de otro usuario registrado.
 
-No Java, Maven, Node or PostgreSQL installation required — only Docker.
+## Stack tecnológico
+
+Capa | Tecnología
+------------ | -------------
+<img src="https://img.shields.io/badge/backend%20-%23323330.svg?&style=for-the-badge&logo=spring&logoColor=white&color=6DB33F" /> | Java 21 · Spring Boot 4.1.0 · Spring Data JPA (Hibernate) · Spring Security · Liquibase · WebSocket/STOMP
+<img src="https://img.shields.io/badge/frontend%20-%23323330.svg?&style=for-the-badge&logo=react&logoColor=black&color=61DAFB" /> | React 19 · TypeScript · Vite 8 · Material UI · React Router
+<img src="https://img.shields.io/badge/base%20de%20datos%20-%23323330.svg?&style=for-the-badge&logo=postgresql&logoColor=white&color=4169E1" /> | PostgreSQL 16
+<img src="https://img.shields.io/badge/infra%20-%23323330.svg?&style=for-the-badge&logo=docker&logoColor=white&color=2496ED" /> | Docker Compose (desarrollo local) · Render (backend + BD) · Netlify (frontend)
+
+## Requisitos y versiones
+
+Herramienta | Versión usada en desarrollo
+------------ | -------------
+Java (JDK) | 21 (probado con 21.0.10)
+Maven | No requiere instalación — se usa el wrapper incluido (`./mvnw`)
+Node.js | 25.8.1
+npm | 11.11.0
+Docker | 29.7.2
+Docker Compose | 5.5.0 (compatible con `docker compose` v2 y `docker-compose` v1)
+PostgreSQL | 16 (se levanta automáticamente vía Docker, no requiere instalación manual)
+
+> **Nota sobre Docker**: si no usas Docker Desktop, puedes usar [Colima](https://github.com/abiosoft/colima) como motor de contenedores en macOS:
+> ```bash
+> brew install docker docker-compose colima
+> colima start
+> ```
+
+## Cómo correr el proyecto
+
+### Opción 1 — Un solo comando (recomendado)
+
+Desde la raíz del repositorio:
 
 ```bash
 ./run.sh
 ```
 
-This builds the backend image, starts PostgreSQL and the backend, and waits for the database
-to be healthy before starting the API. The backend is available at `http://localhost:8080`.
+Esto construye la imagen del backend, levanta PostgreSQL y el backend juntos (esperando a que la base de datos esté saludable antes de arrancar la API), y ejecuta las migraciones de Liquibase automáticamente. No necesitas tener Java, Maven ni PostgreSQL instalados — solo Docker.
 
-To also run the frontend against it, in a separate terminal:
+Backend disponible en `http://localhost:8080`.
+
+Para correr también el frontend contra él, en otra terminal:
 
 ```bash
 cd frontend
@@ -54,61 +83,115 @@ npm install
 npm run dev
 ```
 
-The frontend reads the API URL from `frontend/.env` (`VITE_API_URL`), already pointed at
-`http://localhost:8080/api` for local development.
+Frontend disponible en `http://localhost:5173`. Lee la URL del backend desde `frontend/.env` (`VITE_API_URL`), ya apuntada a `http://localhost:8080/api`.
 
-## Running without Docker
-
-### Backend
+### Opción 2 — Backend sin Docker (Docker solo para Postgres)
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-By default this uses Spring Boot's Docker Compose integration (`backend/compose.yaml`) to
-start a local PostgreSQL container automatically — you still need Docker installed for this,
-but not for building/running the Java app itself. Liquibase creates the schema automatically
-on startup; there is no manual DB setup step.
+Por defecto usa la integración de Docker Compose de Spring Boot (`backend/compose.yaml`) para levantar un Postgres local automáticamente — igual necesitas Docker instalado para esto, pero no para compilar/correr la app en sí. Liquibase crea el schema automáticamente al arrancar; no hay ningún paso manual de configuración de base de datos.
 
-### Frontend
+El frontend se corre igual que en la Opción 1.
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+> `compose.yaml` (raíz) es distinto de `backend/compose.yaml` — el de la raíz levanta **backend + Postgres** juntos (Opción 1); el de `backend/` solo levanta **Postgres**, para cuando corres el backend directo con `./mvnw spring-boot:run` (Opción 2). No los uses a la vez, chocan en el puerto 5432.
 
-Open `http://localhost:5173`.
-
-## Login
-
-There is no seeded/default user — register your own account from the app (`/register`), then
-log in (`/login`) with the same username and password. Every user's notes and categories are
-private to that account.
-
-Authentication uses HTTP Basic under the hood: the frontend stores the credentials for the
-current session (`sessionStorage`) and attaches them to every API request, including the
-WebSocket connection used for live sync.
-
-## Project structure
+## Estructura del repositorio
 
 ```
-backend/    Spring Boot REST API (Controller → Service → Repository), PostgreSQL via
-            JPA/Hibernate, schema managed by Liquibase.
-frontend/   React + TypeScript SPA (Vite), built as an isolated app with its own
-            package.json.
-compose.yaml  Orchestrates the backend + PostgreSQL for the one-command run.
-run.sh        Single entry point to start the whole stack.
+HuancaParqui-334763/
+├── backend/          # API REST — Spring Boot (Controller → Service → Repository)
+│   └── Dockerfile    # Imagen del backend (multi-stage: build con Maven, runtime con JRE)
+├── frontend/         # SPA — React + Vite + TypeScript
+├── compose.yaml      # Stack completo en contenedores (backend + Postgres)
+├── render.yaml       # Blueprint de despliegue en Render (backend + BD gestionada)
+└── run.sh            # Script de arranque en un solo comando
 ```
 
-## Notes on the extra features
+## Funcionalidades
 
-- **Real-time sync**: two open sessions of the *same* logged-in user see each other's changes
-  instantly (WebSocket/STOMP). Different users never see each other's data.
-- **Per-user data**: notes and categories belong to the user that created them; trying to
-  access another user's note or category returns 404, never leaking whether it exists.
-- **Live deployment**: backend on Render (Docker + managed Postgres), frontend on Netlify —
-  see [Live demo](#live-demo) above. Also verified locally via `./run.sh` plus manual
-  end-to-end testing (register → login → create/tag/filter/archive notes) against the fully
-  containerized stack.
+### Fase 1 (obligatoria)
+- [x] Crear, editar y borrar notas
+- [x] Archivar / desarchivar notas
+- [x] Listar notas activas
+- [x] Listar notas archivadas
+
+### Fase 2 (extra)
+- [x] Agregar / quitar categorías a una nota
+- [x] Filtrar notas por categoría
+
+### Extra
+- [x] Registro y login reales (Spring Security, HTTP Basic, tabla `users` en Postgres)
+- [x] Notas y categorías privadas por usuario — cada quien ve y administra solo lo suyo
+- [x] Sincronización en tiempo real entre sesiones del mismo usuario (WebSocket/STOMP)
+- [x] Deploy en vivo (Render + Netlify)
+- [x] Backend containerizado (Dockerfile + `docker compose up`, sin depender de Java/Maven instalados)
+- [x] Interfaz con Material UI en login, registro y notas
+
+## Arquitectura
+
+**Backend** — capas separadas siguiendo el patrón Service Layer:
+
+```
+Controller (REST, @RestController)
+    ↓
+Service (lógica de negocio, @Transactional)
+    ↓
+Repository (Spring Data JPA)
+    ↓
+PostgreSQL (vía Hibernate + migraciones versionadas con Liquibase)
+```
+
+- `Note` y `Category` tienen una relación muchos-a-muchos (`note_categories`); cada una además pertenece a un `AppUser` (uno-a-muchos), y toda consulta se filtra por el usuario autenticado.
+- Cambios (crear/editar/borrar nota o categoría) se notifican en tiempo real vía WebSocket/STOMP a las demás sesiones abiertas del mismo usuario.
+- Los DTOs (`NoteRequestDto`, `NoteResponseDto`, `CategoryRequestDto`, `CategoryResponseDto`) desacoplan el contrato REST del modelo de persistencia.
+- El schema de la base de datos se versiona con Liquibase (`db/changelog/`), no con `ddl-auto` de Hibernate.
+
+**Frontend** — SPA en React con capa de servicios separada de los componentes:
+
+```
+components/ (NoteForm, NoteList, Sidebar, Login, Register, ConfirmDialog...)
+    ↓
+services/ (noteService, categoryService, authService, http.ts, realtime.ts)
+    ↓
+API REST + WebSocket del backend
+```
+
+## Despliegue
+
+Componente | Plataforma | Notas
+------------ | ------------- | -------------
+Backend + PostgreSQL | [Render](https://render.com) | Desplegado vía Blueprint (`render.yaml`): construye la imagen Docker del backend y aprovisiona una base Postgres gestionada, conectando ambos automáticamente por variables de entorno.
+Frontend | [Netlify](https://netlify.com) | Build de Vite con `VITE_API_URL` apuntando al backend de Render.
+
+Variables de entorno del servicio backend en Render (las `DB_*` se conectan solas desde la base de datos vía el Blueprint, no se copian a mano):
+
+```
+SPRING_PROFILES_ACTIVE=prod
+JDK_JAVA_OPTIONS=-Xmx400m
+DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD   ← auto-conectadas desde notes-db
+APP_CORS_ALLOWED_ORIGINS=https://delightful-pastelito-180611.netlify.app
+```
+
+Variable de entorno configurada en Netlify (proyecto frontend):
+
+```
+VITE_API_URL=https://notes-backend-1tnf.onrender.com/api
+```
+
+---
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/ElizabethYasmin">
+        <img src="https://avatars.githubusercontent.com/u/62725994?v=4" width="100px;" alt="Foto de perfil de GitHub"/><br>
+        <sub>
+          <b>Elizabeth Yasmin Huanca Parqui</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>
