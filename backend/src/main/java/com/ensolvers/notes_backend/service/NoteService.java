@@ -3,9 +3,11 @@ package com.ensolvers.notes_backend.service;
 import com.ensolvers.notes_backend.dto.CategoryResponseDto;
 import com.ensolvers.notes_backend.dto.NoteRequestDto;
 import com.ensolvers.notes_backend.dto.NoteResponseDto;
+import com.ensolvers.notes_backend.entity.AppUser;
 import com.ensolvers.notes_backend.entity.Category;
 import com.ensolvers.notes_backend.entity.Note;
 import com.ensolvers.notes_backend.repository.NoteRepository;
+import com.ensolvers.notes_backend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,76 +22,92 @@ import java.util.Set;
 public class NoteService {
 
     private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
     private final CategoryService categoryService;
 
-    public NoteService(NoteRepository noteRepository, CategoryService categoryService) {
+    public NoteService(NoteRepository noteRepository, UserRepository userRepository, CategoryService categoryService) {
         this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
         this.categoryService = categoryService;
     }
 
-    public NoteResponseDto create(NoteRequestDto request) {
+    public NoteResponseDto create(String username, NoteRequestDto request) {
+        AppUser user = getUser(username);
         Note note = new Note();
         note.setTitle(request.title());
         note.setContent(request.content());
-        note.setCategories(resolveCategories(request.categoryIds()));
+        note.setUser(user);
+        note.setCategories(resolveCategories(user.getId(), request.categoryIds()));
         return toDto(noteRepository.save(note));
     }
 
-    public NoteResponseDto update(Long id, NoteRequestDto request) {
-        Note note = findOrThrow(id);
+    public NoteResponseDto update(String username, Long id, NoteRequestDto request) {
+        AppUser user = getUser(username);
+        Note note = findOrThrow(id, user.getId());
         note.setTitle(request.title());
         note.setContent(request.content());
-        note.setCategories(resolveCategories(request.categoryIds()));
+        note.setCategories(resolveCategories(user.getId(), request.categoryIds()));
         return toDto(noteRepository.save(note));
     }
 
-    public void delete(Long id) {
-        Note note = findOrThrow(id);
+    public void delete(String username, Long id) {
+        AppUser user = getUser(username);
+        Note note = findOrThrow(id, user.getId());
         noteRepository.delete(note);
     }
 
-    public NoteResponseDto archive(Long id) {
-        Note note = findOrThrow(id);
+    public NoteResponseDto archive(String username, Long id) {
+        AppUser user = getUser(username);
+        Note note = findOrThrow(id, user.getId());
         note.setArchived(true);
         return toDto(noteRepository.save(note));
     }
 
-    public NoteResponseDto unarchive(Long id) {
-        Note note = findOrThrow(id);
+    public NoteResponseDto unarchive(String username, Long id) {
+        AppUser user = getUser(username);
+        Note note = findOrThrow(id, user.getId());
         note.setArchived(false);
         return toDto(noteRepository.save(note));
     }
 
-    public NoteResponseDto getById(Long id) {
-        return toDto(findOrThrow(id));
+    public NoteResponseDto getById(String username, Long id) {
+        AppUser user = getUser(username);
+        return toDto(findOrThrow(id, user.getId()));
     }
 
-    public List<NoteResponseDto> listActive(Long categoryId) {
+    public List<NoteResponseDto> listActive(String username, Long categoryId) {
+        AppUser user = getUser(username);
         List<Note> notes = categoryId == null
-                ? noteRepository.findByArchivedFalse()
-                : noteRepository.findByArchivedFalseAndCategories_Id(categoryId);
+                ? noteRepository.findByUser_IdAndArchivedFalse(user.getId())
+                : noteRepository.findByUser_IdAndArchivedFalseAndCategories_Id(user.getId(), categoryId);
         return notes.stream().map(this::toDto).toList();
     }
 
-    public List<NoteResponseDto> listArchived(Long categoryId) {
+    public List<NoteResponseDto> listArchived(String username, Long categoryId) {
+        AppUser user = getUser(username);
         List<Note> notes = categoryId == null
-                ? noteRepository.findByArchivedTrue()
-                : noteRepository.findByArchivedTrueAndCategories_Id(categoryId);
+                ? noteRepository.findByUser_IdAndArchivedTrue(user.getId())
+                : noteRepository.findByUser_IdAndArchivedTrueAndCategories_Id(user.getId(), categoryId);
         return notes.stream().map(this::toDto).toList();
     }
 
-    private Set<Category> resolveCategories(List<Long> categoryIds) {
+    private Set<Category> resolveCategories(Long userId, List<Long> categoryIds) {
         Set<Category> categories = new HashSet<>();
         if (categoryIds != null) {
             for (Long categoryId : categoryIds) {
-                categories.add(categoryService.findOrThrow(categoryId));
+                categories.add(categoryService.findOrThrow(categoryId, userId));
             }
         }
         return categories;
     }
 
-    private Note findOrThrow(Long id) {
-        return noteRepository.findById(id)
+    private AppUser getUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found: " + username));
+    }
+
+    private Note findOrThrow(Long id, Long userId) {
+        return noteRepository.findByIdAndUser_Id(id, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found: " + id));
     }
 

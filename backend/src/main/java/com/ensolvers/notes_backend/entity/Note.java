@@ -36,6 +36,10 @@ public class Note {
     )
     private Set<Category> categories = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
@@ -64,4 +68,7 @@ public class Note {
 
     public Set<Category> getCategories() { return categories; }
     public void setCategories(Set<Category> categories) { this.categories = categories; }
+
+    public AppUser getUser() { return user; }
+    public void setUser(AppUser user) { this.user = user; }
 }

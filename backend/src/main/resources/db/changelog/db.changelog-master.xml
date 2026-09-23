@@ -9,5 +9,7 @@
     <include file="db/changelog/changes/002-create-categories-table.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/003-create-note-categories-table.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/004-create-users-table.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/005-add-user-to-notes.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/006-add-user-to-categories.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
