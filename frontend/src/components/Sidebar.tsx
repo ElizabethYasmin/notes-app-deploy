@@ -1,9 +1,8 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import type { Category } from "../types/Note";
 
 interface SidebarProps {
-  tab: "active" | "archived";
-  onTabChange: (tab: "active" | "archived") => void;
   categories: Category[];
   categoryFilter: number | undefined;
   onCategoryFilterChange: (id: number | undefined) => void;
@@ -12,11 +11,10 @@ interface SidebarProps {
   onCreateCategory: (e: React.FormEvent) => void;
   onUpdateCategory: (id: number, name: string) => void;
   onDeleteCategory: (id: number) => void;
+  onLogout: () => void;
 }
 
 export function Sidebar({
-  tab,
-  onTabChange,
   categories,
   categoryFilter,
   onCategoryFilterChange,
@@ -25,6 +23,7 @@ export function Sidebar({
   onCreateCategory,
   onUpdateCategory,
   onDeleteCategory,
+  onLogout,
 }: SidebarProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState("");
@@ -49,18 +48,19 @@ export function Sidebar({
       <div>
         <div className="sidebar-section-label">Notas</div>
         <div className="sidebar-nav">
-          <button
-            className={`sidebar-item ${tab === "active" ? "active" : ""}`}
-            onClick={() => onTabChange("active")}
+          <NavLink
+            to="/notes"
+            end
+            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
           >
             🗂️ Activas
-          </button>
-          <button
-            className={`sidebar-item ${tab === "archived" ? "active" : ""}`}
-            onClick={() => onTabChange("archived")}
+          </NavLink>
+          <NavLink
+            to="/notes/archived"
+            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
           >
             🗄️ Archivadas
-          </button>
+          </NavLink>
         </div>
       </div>
 
@@ -129,6 +129,10 @@ export function Sidebar({
           />
         </form>
       </div>
+
+      <button className="sidebar-item" onClick={onLogout} style={{ marginTop: "auto" }}>
+        🚪 Cerrar sesión
+      </button>
     </aside>
   );
 }
