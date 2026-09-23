@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { noteService } from "../services/noteService";
 import { categoryService } from "../services/categoryService";
 import { connectRealtime, disconnectRealtime } from "../services/realtime";
@@ -157,7 +159,7 @@ export function NotesPage({ tab }: NotesPageProps) {
   }
 
   return (
-    <div className="app-shell">
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar
         categories={categories}
         categoryFilter={categoryFilter}
@@ -170,16 +172,16 @@ export function NotesPage({ tab }: NotesPageProps) {
         onLogout={handleLogout}
       />
 
-      <main className="main-content">
-        <h1 className="page-title">{tab === "active" ? "Activas" : "Archivadas"}</h1>
+      <Box component="main" sx={{ flex: 1, maxWidth: 760, mx: "auto", width: "100%", px: 4, py: 5 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
+          {tab === "active" ? "Activas" : "Archivadas"}
+        </Typography>
 
-        <div className="quick-add">
-          <NoteForm
-            editingNote={editingNote}
-            onSubmit={handleSubmit}
-            onCancelEdit={() => setEditingNote(null)}
-          />
-        </div>
+        <NoteForm
+          editingNote={editingNote}
+          onSubmit={handleSubmit}
+          onCancelEdit={() => setEditingNote(null)}
+        />
 
         <NoteList
           notes={notes}
@@ -191,7 +193,7 @@ export function NotesPage({ tab }: NotesPageProps) {
           onAddCategory={handleAddCategory}
           onRemoveCategory={handleRemoveCategory}
         />
-      </main>
+      </Box>
 
       <ConfirmDialog
         open={deleteTarget !== null}
@@ -204,6 +206,6 @@ export function NotesPage({ tab }: NotesPageProps) {
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
       />
-    </div>
+    </Box>
   );
 }

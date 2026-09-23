@@ -1,4 +1,10 @@
 import { useEffect, useState } from "react";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import type { Note, NoteRequest } from "../types/Note";
 
 interface NoteFormProps {
@@ -30,28 +36,45 @@ export function NoteForm({ editingNote, onSubmit, onCancelEdit }: NoteFormProps)
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Título"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <textarea
-        placeholder="Escribe algo..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      <div className="form-actions">
-        <button type="submit" className="btn btn-primary">
-          {editingNote ? "Guardar cambios" : "Crear nota"}
-        </button>
-        {editingNote && (
-          <button type="button" className="btn btn-ghost" onClick={onCancelEdit}>
-            Cancelar
-          </button>
-        )}
-      </div>
-    </form>
+    <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          variant="standard"
+          placeholder="Título"
+          fullWidth
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          slotProps={{ input: { disableUnderline: true, sx: { fontSize: 18, fontWeight: 600 } } }}
+        />
+        <TextField
+          variant="standard"
+          placeholder="Escribe algo..."
+          fullWidth
+          multiline
+          minRows={2}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          sx={{ mt: 0.5 }}
+          slotProps={{ input: { disableUnderline: true } }}
+        />
+        <Box sx={{ display: "flex", gap: 1, mt: 1.5 }}>
+          <Button type="submit" variant="contained" size="small" startIcon={<AddOutlinedIcon />}>
+            {editingNote ? "Guardar cambios" : "Crear nota"}
+          </Button>
+          {editingNote && (
+            <Button
+              type="button"
+              variant="text"
+              size="small"
+              color="inherit"
+              startIcon={<CloseOutlinedIcon />}
+              onClick={onCancelEdit}
+            >
+              Cancelar
+            </Button>
+          )}
+        </Box>
+      </Box>
+    </Paper>
   );
 }
