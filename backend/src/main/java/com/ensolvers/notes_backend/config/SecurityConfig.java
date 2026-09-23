@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         // The WebSocket handshake itself is open; real auth happens per
                         // connection on the STOMP CONNECT frame (see StompAuthChannelInterceptor).
