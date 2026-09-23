@@ -24,11 +24,14 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final CategoryService categoryService;
+    private final RealtimeNotifier realtimeNotifier;
 
-    public NoteService(NoteRepository noteRepository, UserRepository userRepository, CategoryService categoryService) {
+    public NoteService(NoteRepository noteRepository, UserRepository userRepository,
+                        CategoryService categoryService, RealtimeNotifier realtimeNotifier) {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.categoryService = categoryService;
+        this.realtimeNotifier = realtimeNotifier;
     }
 
     public NoteResponseDto create(String username, NoteRequestDto request) {
@@ -38,7 +41,9 @@ public class NoteService {
         note.setContent(request.content());
         note.setUser(user);
         note.setCategories(resolveCategories(user.getId(), request.categoryIds()));
-        return toDto(noteRepository.save(note));
+        NoteResponseDto dto = toDto(noteRepository.save(note));
+        realtimeNotifier.notifyUser(username);
+        return dto;
     }
 
     public NoteResponseDto update(String username, Long id, NoteRequestDto request) {
@@ -47,27 +52,34 @@ public class NoteService {
         note.setTitle(request.title());
         note.setContent(request.content());
         note.setCategories(resolveCategories(user.getId(), request.categoryIds()));
-        return toDto(noteRepository.save(note));
+        NoteResponseDto dto = toDto(noteRepository.save(note));
+        realtimeNotifier.notifyUser(username);
+        return dto;
     }
 
     public void delete(String username, Long id) {
         AppUser user = getUser(username);
         Note note = findOrThrow(id, user.getId());
         noteRepository.delete(note);
+        realtimeNotifier.notifyUser(username);
     }
 
     public NoteResponseDto archive(String username, Long id) {
         AppUser user = getUser(username);
         Note note = findOrThrow(id, user.getId());
         note.setArchived(true);
-        return toDto(noteRepository.save(note));
+        NoteResponseDto dto = toDto(noteRepository.save(note));
+        realtimeNotifier.notifyUser(username);
+        return dto;
     }
 
     public NoteResponseDto unarchive(String username, Long id) {
         AppUser user = getUser(username);
         Note note = findOrThrow(id, user.getId());
         note.setArchived(false);
-        return toDto(noteRepository.save(note));
+        NoteResponseDto dto = toDto(noteRepository.save(note));
+        realtimeNotifier.notifyUser(username);
+        return dto;
     }
 
     public NoteResponseDto getById(String username, Long id) {

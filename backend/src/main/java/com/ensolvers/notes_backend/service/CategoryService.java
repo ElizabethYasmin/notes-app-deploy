@@ -17,10 +17,13 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final RealtimeNotifier realtimeNotifier;
 
-    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository) {
+    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository,
+                            RealtimeNotifier realtimeNotifier) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.realtimeNotifier = realtimeNotifier;
     }
 
     public CategoryResponseDto create(String username, CategoryRequestDto request) {
@@ -31,7 +34,9 @@ public class CategoryService {
         Category category = new Category();
         category.setName(request.name());
         category.setUser(user);
-        return toDto(categoryRepository.save(category));
+        CategoryResponseDto dto = toDto(categoryRepository.save(category));
+        realtimeNotifier.notifyUser(username);
+        return dto;
     }
 
     public List<CategoryResponseDto> listAll(String username) {
@@ -48,13 +53,16 @@ public class CategoryService {
             }
         });
         category.setName(request.name());
-        return toDto(categoryRepository.save(category));
+        CategoryResponseDto dto = toDto(categoryRepository.save(category));
+        realtimeNotifier.notifyUser(username);
+        return dto;
     }
 
     public void delete(String username, Long id) {
         AppUser user = getUser(username);
         Category category = findOrThrow(id, user.getId());
         categoryRepository.delete(category);
+        realtimeNotifier.notifyUser(username);
     }
 
     Category findOrThrow(Long id, Long userId) {
