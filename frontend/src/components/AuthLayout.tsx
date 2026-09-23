@@ -47,12 +47,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           py: 6,
         }}
       >
-        <Box sx={{ width: "100%", maxWidth: 380, mx: "auto" }}>
-          <Typography variant="subtitle2" sx={{ mb: 4, fontWeight: 700 }}>
-            📝 Mis Notas
-          </Typography>
-          {children}
-        </Box>
+        <Box sx={{ width: "100%", maxWidth: 380, mx: "auto" }}>{children}</Box>
       </Box>
 
       {/* Right: feature showcase, hidden on small screens */}
