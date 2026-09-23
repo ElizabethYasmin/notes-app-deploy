@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { noteService } from "../services/noteService";
 import { categoryService } from "../services/categoryService";
+import { connectRealtime, disconnectRealtime } from "../services/realtime";
 import { NoteForm } from "../components/NoteForm";
 import { NoteList } from "../components/NoteList";
 import { Sidebar } from "../components/Sidebar";
@@ -38,6 +39,22 @@ export function NotesPage({ tab }: NotesPageProps) {
 
   useEffect(() => {
     loadCategories();
+  }, []);
+
+  // Kept fresh on every render so the WebSocket callback below (set up once, on mount)
+  // always refetches with the current tab/categoryFilter instead of a stale closure.
+  const refreshRef = useRef(() => {
+    loadNotes();
+    loadCategories();
+  });
+  refreshRef.current = () => {
+    loadNotes();
+    loadCategories();
+  };
+
+  useEffect(() => {
+    connectRealtime(() => refreshRef.current());
+    return () => disconnectRealtime();
   }, []);
 
   async function handleSubmit(data: NoteRequest) {
@@ -119,6 +136,7 @@ export function NotesPage({ tab }: NotesPageProps) {
   }
 
   function handleLogout() {
+    disconnectRealtime();
     clearAuthHeader();
     navigate("/login");
   }
