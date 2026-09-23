@@ -10,6 +10,17 @@ data persisted in PostgreSQL via JPA/Hibernate (no mocks, no in-memory storage).
   live sync across open sessions of the same user (WebSocket/STOMP), and a fully
   containerized one-command setup.
 
+## Live demo
+
+- Frontend: https://delightful-pastelito-180611.netlify.app
+- Backend: https://notes-backend-1tnf.onrender.com
+
+There is no seeded user — register your own account from the live frontend before logging in.
+
+> The backend runs on Render's free tier, which spins the service down after periods of
+> inactivity. The first request after it's been idle can take up to ~50 seconds while it wakes
+> back up; subsequent requests are fast until it goes idle again.
+
 ## Requirements
 
 | Tool | Version used |
@@ -97,6 +108,7 @@ run.sh        Single entry point to start the whole stack.
   instantly (WebSocket/STOMP). Different users never see each other's data.
 - **Per-user data**: notes and categories belong to the user that created them; trying to
   access another user's note or category returns 404, never leaking whether it exists.
-- **Live deployment**: not deployed for this submission repository; verified locally via
-  `./run.sh` plus manual end-to-end testing (register → login → create/tag/filter/archive
-  notes) against the fully containerized stack.
+- **Live deployment**: backend on Render (Docker + managed Postgres), frontend on Netlify —
+  see [Live demo](#live-demo) above. Also verified locally via `./run.sh` plus manual
+  end-to-end testing (register → login → create/tag/filter/archive notes) against the fully
+  containerized stack.
