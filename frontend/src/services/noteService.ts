@@ -12,11 +12,15 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export const noteService = {
 
-  listActive: (): Promise<Note[]> =>
-    fetch(`${API_URL}/notes/active`).then((r) => handleResponse<Note[]>(r)),
+  listActive: (categoryId?: number): Promise<Note[]> => {
+    const query = categoryId ? `?categoryId=${categoryId}` : "";
+    return fetch(`${API_URL}/notes/active${query}`).then((r) => handleResponse<Note[]>(r));
+  },
 
-  listArchived: (): Promise<Note[]> =>
-    fetch(`${API_URL}/notes/archived`).then((r) => handleResponse<Note[]>(r)),
+  listArchived: (categoryId?: number): Promise<Note[]> => {
+    const query = categoryId ? `?categoryId=${categoryId}` : "";
+    return fetch(`${API_URL}/notes/archived${query}`).then((r) => handleResponse<Note[]>(r));
+  },
 
   create: (data: NoteRequest): Promise<Note> =>
     fetch(`${API_URL}/notes`, {

@@ -1,3 +1,8 @@
+export interface Category {
+  id: number;
+  name: string;
+}
+
 export interface Note {
   id: number;
   title: string;
@@ -5,9 +10,11 @@ export interface Note {
   archived: boolean;
   createdAt: string;
   updatedAt: string;
+  categories: Category[];
 }
 
 export interface NoteRequest {
   title: string;
   content: string;
+  categoryIds?: number[];
 }
