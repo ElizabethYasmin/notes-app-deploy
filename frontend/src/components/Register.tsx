@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
-import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { AuthLayout } from "./AuthLayout";
 import { authService } from "../services/authService";
 
 export function Register() {
@@ -18,6 +19,7 @@ export function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,92 +50,108 @@ export function Register() {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
+    <AuthLayout>
+      <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: 1.5 }}>
+        Crear cuenta
+      </Typography>
+      <Typography
+        variant="h4"
+        sx={{ fontFamily: "Georgia, 'Times New Roman', serif", mb: 1 }}
       >
-        <Paper elevation={3} sx={{ p: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
-            <PersonAddOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            📝 Mis Notas
+        Empieza a <em>anotar</em>
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+        Tu propio espacio privado para notas y categorías.
+      </Typography>
+
+      {success ? (
+        <Alert severity="success">¡Cuenta creada! Redirigiendo a iniciar sesión...</Alert>
+      ) : (
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <Typography variant="body2" sx={{ mb: 0.5 }}>
+            Usuario
           </Typography>
+          <TextField
+            required
+            fullWidth
+            size="small"
+            placeholder="tu-usuario"
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            sx={{ mb: 2 }}
+          />
 
-          {success ? (
-            <Alert severity="success" sx={{ mt: 3, width: "100%" }}>
-              ¡Cuenta creada! Redirigiendo a iniciar sesión...
+          <Typography variant="body2" sx={{ mb: 0.5 }}>
+            Contraseña
+          </Typography>
+          <TextField
+            required
+            fullWidth
+            size="small"
+            placeholder="Mínimo 6 caracteres"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ mb: 2 }}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="mostrar/ocultar contraseña"
+                      onClick={() => setShowPassword((v) => !v)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <Typography variant="body2" sx={{ mb: 0.5 }}>
+            Confirmar contraseña
+          </Typography>
+          <TextField
+            required
+            fullWidth
+            size="small"
+            placeholder="Repite tu contraseña"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
             </Alert>
-          ) : (
-            <>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Crea tu cuenta
-              </Typography>
-
-              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3, width: "100%" }}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  label="Usuario"
-                  autoComplete="username"
-                  autoFocus
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  label="Contraseña (mínimo 6 caracteres)"
-                  type="password"
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  label="Confirmar contraseña"
-                  type="password"
-                  autoComplete="new-password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-
-                {error && (
-                  <Alert severity="error" sx={{ mt: 2 }}>
-                    {error}
-                  </Alert>
-                )}
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  disabled={loading}
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : "Registrarme"}
-                </Button>
-
-                <Typography variant="body2" align="center">
-                  ¿Ya tienes cuenta?{" "}
-                  <Link component={RouterLink} to="/login">
-                    Inicia sesión
-                  </Link>
-                </Typography>
-              </Box>
-            </>
           )}
-        </Paper>
-      </Box>
-    </Container>
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={loading}
+            sx={{ mt: 3, mb: 2, py: 1.2, borderRadius: 2 }}
+          >
+            {loading ? <CircularProgress size={22} color="inherit" /> : "Registrarme"}
+          </Button>
+
+          <Typography variant="body2" align="center" color="text.secondary">
+            ¿Ya tienes cuenta?{" "}
+            <Link component={RouterLink} to="/login" sx={{ fontWeight: 700 }}>
+              Inicia sesión
+            </Link>
+          </Typography>
+        </Box>
+      )}
+    </AuthLayout>
   );
 }
