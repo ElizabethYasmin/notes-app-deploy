@@ -6,12 +6,15 @@ import { connectRealtime, disconnectRealtime } from "../services/realtime";
 import { NoteForm } from "../components/NoteForm";
 import { NoteList } from "../components/NoteList";
 import { Sidebar } from "../components/Sidebar";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { clearAuthHeader } from "../services/http";
 import type { Category, Note, NoteRequest } from "../types/Note";
 
 interface NotesPageProps {
   tab: "active" | "archived";
 }
+
+type DeleteTarget = { type: "note" | "category"; id: number; label: string };
 
 export function NotesPage({ tab }: NotesPageProps) {
   const navigate = useNavigate();
@@ -20,6 +23,7 @@ export function NotesPage({ tab }: NotesPageProps) {
   const [categoryFilter, setCategoryFilter] = useState<number | undefined>(undefined);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
 
   async function loadNotes() {
     const data =
@@ -70,10 +74,9 @@ export function NotesPage({ tab }: NotesPageProps) {
     loadNotes();
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm("¿Borrar esta nota? Esta acción no se puede deshacer.")) return;
-    await noteService.remove(id);
-    loadNotes();
+  function handleDelete(id: number) {
+    const note = notes.find((n) => n.id === id);
+    setDeleteTarget({ type: "note", id, label: note?.title ?? "esta nota" });
   }
 
   async function handleArchive(id: number) {
@@ -126,13 +129,25 @@ export function NotesPage({ tab }: NotesPageProps) {
     loadNotes(); // note.categories embeds the name, so open notes need the fresh label too
   }
 
-  async function handleDeleteCategory(id: number) {
+  function handleDeleteCategory(id: number) {
     const category = categories.find((c) => c.id === id);
-    if (!confirm(`¿Borrar la categoría "${category?.name}"? Se quitará de todas tus notas.`)) return;
-    await categoryService.remove(id);
-    if (categoryFilter === id) setCategoryFilter(undefined);
-    loadCategories();
-    loadNotes();
+    setDeleteTarget({ type: "category", id, label: category?.name ?? "esta categoría" });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === "note") {
+      await noteService.remove(deleteTarget.id);
+      loadNotes();
+    } else {
+      await categoryService.remove(deleteTarget.id);
+      if (categoryFilter === deleteTarget.id) setCategoryFilter(undefined);
+      loadCategories();
+      loadNotes();
+    }
+
+    setDeleteTarget(null);
   }
 
   function handleLogout() {
@@ -177,6 +192,18 @@ export function NotesPage({ tab }: NotesPageProps) {
           onRemoveCategory={handleRemoveCategory}
         />
       </main>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={deleteTarget?.type === "note" ? "Borrar nota" : "Borrar categoría"}
+        description={
+          deleteTarget?.type === "note"
+            ? `¿Borrar la nota "${deleteTarget.label}"? Esta acción no se puede deshacer.`
+            : `¿Borrar la categoría "${deleteTarget?.label}"? Se quitará de todas tus notas.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
