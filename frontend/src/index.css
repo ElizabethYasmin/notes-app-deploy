@@ -345,34 +345,3 @@ textarea {
   font-size: 14px;
   padding: 24px 8px;
 }
-
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-sidebar-bg);
-}
-
-.login-card {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 32px;
-  width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.login-subtitle {
-  color: var(--color-text-muted);
-  font-size: 13px;
-  margin: -12px 0 4px;
-}
-
-.login-error {
-  color: var(--color-danger);
-  font-size: 13px;
-  margin: 0;
-}

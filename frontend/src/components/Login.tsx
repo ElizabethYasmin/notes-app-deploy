@@ -1,5 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Link from "@mui/material/Link";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { setAuthHeader } from "../services/http";
 
 export function Login() {
@@ -7,49 +18,98 @@ export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    const testHeader = "Basic " + btoa(`${username}:${password}`);
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
-      headers: { Authorization: testHeader },
-    });
+    try {
+      const testHeader = "Basic " + btoa(`${username}:${password}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
+        headers: { Authorization: testHeader },
+      });
 
-    if (res.ok) {
-      setAuthHeader(username, password);
-      navigate("/notes");
-    } else {
-      setError("Usuario o contraseña incorrectos");
+      if (res.ok) {
+        setAuthHeader(username, password);
+        navigate("/notes");
+      } else {
+        setError("Usuario o contraseña incorrectos");
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="login-container">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <h1 className="page-title">📝 Mis Notas</h1>
-        <p className="login-subtitle">Inicia sesión para continuar</p>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <p className="login-error">{error}</p>}
-        <button type="submit" className="btn btn-primary">
-          Ingresar
-        </button>
-        <p className="login-subtitle">
-          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
-        </p>
-      </form>
-    </div>
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            📝 Mis Notas
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Inicia sesión para continuar
+          </Typography>
+
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3, width: "100%" }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Usuario"
+              autoComplete="username"
+              autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Contraseña"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            {error && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading}
+              sx={{ mt: 3, mb: 2 }}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Ingresar"}
+            </Button>
+
+            <Typography variant="body2" align="center">
+              ¿No tienes cuenta?{" "}
+              <Link component={RouterLink} to="/register">
+                Regístrate
+              </Link>
+            </Typography>
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
   );
 }
